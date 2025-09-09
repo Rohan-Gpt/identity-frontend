@@ -25,7 +25,6 @@ export default async function ProfilePage({
     );
     console.log("User data fetched:", codingPlatformData);
   } catch (error) {
-    <div>Error fetching user data</div>;
     console.error("Error fetching user data:", error);
   }
 

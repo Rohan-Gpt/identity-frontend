@@ -26,9 +26,9 @@ export async function getUserData(
         withCredentials: true, // Keep this for any client-side calls if needed
       }
     );
-    if (response.data.success === false) {
-      throw new Error("Failed to fetch user data");
-    }
+    // if (response.data.success === false) {
+    //   throw new Error("Failed to fetch user data");
+    // }
     return response.data;
   } catch (err) {
     // The error object from axios is more detailed, let's not hide it.

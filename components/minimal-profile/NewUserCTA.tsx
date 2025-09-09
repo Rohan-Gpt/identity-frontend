@@ -4,7 +4,7 @@ import HackerRank from "./hackerRank";
 import LeetCode from "./leetcode";
 
 export const NewUserCTA = () => (
-  <div className="grid grid-cols-4 gap-8 justify-between items-center animate-pulse">
+  <div className="grid grid-cols-4 gap-8 justify-between items-center">
     <LeetCode />
     <CodeForces />
     <Github />

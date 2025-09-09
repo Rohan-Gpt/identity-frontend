@@ -13,10 +13,10 @@ const WEBSOCKET_URL =
 
 export default function ProfileView({ initialData }: { initialData?: any }) {
   const [platformData, setPlatformData] = useState(
-    initialData?.data.platformData
+    initialData?.data?.platformData ?? null
   );
   const [contributions, setContributions] = useState(
-    initialData?.data.contributions ?? []
+    initialData?.data?.contributions ?? []
   );
   const [isLoading, setIsLoading] = useState(false);
 
