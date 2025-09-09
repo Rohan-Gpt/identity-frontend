@@ -10,7 +10,13 @@ import {
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import { motion } from "motion/react";
-import { use, useEffect, useState, useTransition } from "react";
+import {
+  startTransition,
+  use,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 import {
   Form,
   FormControl,
@@ -29,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { FormError } from "../auth/form-error";
 import { FormSuccess } from "../auth/form-success";
 import ProgressRing from "./progress-ring";
+import axios from "axios";
 
 interface LeetCodeStats {
   totalSolved: number;
@@ -54,27 +61,35 @@ interface LeetCodeStats {
   submissionCalendar: any;
 }
 
-export function LeetCodeStatsCard({ user }: { user: any }) {
-  const [userData, setUserData] = useState<LeetCodeStats>();
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+
+export function LeetCodeStatsCard({ leetcodeData }: { leetcodeData?: any }) {
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+  const [apiResponse, setApiResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // const easyPercentage =
-  //   ((userData?.easySolved ?? 0) / (userData?.totalEasy ?? 0)) * 100;
+  const router = useRouter();
 
-  // const medPercentage =
-  //   ((userData?.mediumSolved ?? 0) / (userData?.totalMedium ?? 0)) * 100;
+  const easyPercentage =
+    ((leetcodeData?.easySolved ?? 0) / (leetcodeData?.totalEasy ?? 0)) * 100;
 
-  // const hardPercentage =
-  //   ((userData?.hardSolved ?? 0) / (userData?.totalHard ?? 0)) * 100;
-  // // const username = "cpcs";
+  const medPercentage =
+    ((leetcodeData?.mediumSolved ?? 0) / (leetcodeData?.totalMedium ?? 0)) *
+    100;
 
-  // const totalPercentage =
-  //   ((userData?.totalSolved ?? 0) / (userData?.totalQuestions ?? 0)) * 100;
+  const hardPercentage =
+    ((leetcodeData?.hardSolved ?? 0) / (leetcodeData?.totalHard ?? 0)) * 100;
+  // const username = "cpcs";
 
-  console.log("completion ratio", userData?.completionRatio);
+  const totalPercentage =
+    ((leetcodeData?.totalSolved ?? 0) / (leetcodeData?.totalQuestions ?? 0)) *
+    100;
+
+  console.log("completion ratio", leetcodeData?.completionRatio);
 
   const FormSchema = z.object({
     username: z.string().min(2, {
@@ -90,8 +105,27 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
   });
 
   function onSubmit(values: z.infer<typeof FormSchema>) {
-    console.log("inside on submit", values.username);
     setUsername(values.username);
+    startTransition(() => {
+      async function fetchLeetCodeData(leetcodeUsername: string) {
+        setLoading(true);
+        const resp = await axios.post(
+          `${BACKEND_URL}${API_BASE}/leetcode`,
+          { leetcodeUsername },
+          { withCredentials: true }
+        );
+
+        if (resp.status === 200) {
+          console.log("LeetCode API Response:", resp.data);
+          setApiResponse(resp.data);
+          setError(resp.data?.error);
+          setSuccess(resp.data?.success);
+        }
+        setLoading(false);
+        router.refresh();
+      }
+      fetchLeetCodeData(values.username);
+    });
   }
 
   return (
@@ -137,7 +171,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
           </>
         ) : (
           <>
-            {username ? (
+            {leetcodeData ? (
               <>
                 <>
                   <motion.div
@@ -147,7 +181,9 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                     transition={{ delay: 0.2 }}
                   >
                     <div className="relative w-24 h-24">
-                      <ProgressRing progress={userData?.completionRatio ?? 0} />
+                      <ProgressRing
+                        progress={leetcodeData?.completionRatio ?? 0}
+                      />
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <motion.span
                           className="text-2xl font-bold"
@@ -155,7 +191,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.8 }}
                         >
-                          {userData?.totalSolved}
+                          {leetcodeData?.totalSolved}
                         </motion.span>
                         <span className="text-xs text-muted-foreground">
                           Problems
@@ -180,7 +216,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                       }}
                     >
                       <div className="text-xl font-bold">
-                        {~~(userData?.contestRating ?? 0)}
+                        {~~(leetcodeData?.contestRating ?? 0)}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         Contest Rating
@@ -196,7 +232,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                       }}
                     >
                       <div className="text-xl font-bold">
-                        {userData?.contestGlobalRanking}
+                        {leetcodeData?.contestGlobalRanking}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         Global Ranking
@@ -212,7 +248,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                       }}
                     >
                       <div className="text-xl font-bold">
-                        {userData?.completionRatio}
+                        {leetcodeData?.completionRatio}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         Completion
@@ -233,7 +269,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                           Easy
                         </span>
                         <span>
-                          {userData?.easySolved}/{userData?.totalEasy}
+                          {leetcodeData?.easySolved}/{leetcodeData?.totalEasy}
                         </span>
                       </div>
                       <motion.div
@@ -257,7 +293,8 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                           Medium
                         </span>
                         <span>
-                          {userData?.mediumSolved}/{userData?.totalMedium}
+                          {leetcodeData?.mediumSolved}/
+                          {leetcodeData?.totalMedium}
                         </span>
                       </div>
                       <motion.div
@@ -281,7 +318,7 @@ export function LeetCodeStatsCard({ user }: { user: any }) {
                           Hard
                         </span>
                         <span>
-                          {userData?.hardSolved}/{userData?.totalHard}
+                          {leetcodeData?.hardSolved}/{leetcodeData?.totalHard}
                         </span>
                       </div>
                       <motion.div

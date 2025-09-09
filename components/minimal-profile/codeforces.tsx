@@ -16,12 +16,12 @@ export default function CodeForces({ data }: { data?: any }) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    async function fetchCodeForcesData(codeForcesUsername: string) {
+    async function fetchCodeForcesData(codeforcesUsername: string) {
       setLoading(true);
       try {
         const resp = await axios.post(
           `${BACKEND_URL}${API_BASE}/codeforces`,
-          { codeForcesUsername },
+          { codeforcesUsername },
           { withCredentials: true }
         );
 

@@ -1,5 +1,7 @@
 import BentoProfile from "@/components/minimal-profile/bento";
+import ProfileView from "@/components/minimal-profile/ProfileView";
 import { getUserData } from "@/utils/getUserData";
+import { cookies } from "next/headers"; // Import the cookies function
 
 export default async function ProfilePage({
   params,
@@ -10,19 +12,20 @@ export default async function ProfilePage({
   if (username === undefined) {
     return (
       <div className="bg-black w-screen h-screen">
-        <h1>User Profile</h1>
-        {/* <BentoProfile /> */}
-        <BentoProfile />
+        <h1 className="text-white text-9xl">404</h1>
       </div>
     );
   }
-  let userData: any = null;
+  let codingPlatformData: any = null;
   try {
-    userData = await getUserData(
-      Array.isArray(username) ? username[0] : username
+    const cookieStore = await cookies();
+    codingPlatformData = await getUserData(
+      Array.isArray(username) ? username[0] : username,
+      cookieStore
     );
-    console.log("User data fetched:", userData);
+    console.log("User data fetched:", codingPlatformData);
   } catch (error) {
+    <div>Error fetching user data</div>;
     console.error("Error fetching user data:", error);
   }
 
@@ -30,11 +33,7 @@ export default async function ProfilePage({
     <div className="bg-black w-screen h-screen">
       <h1>User Profile</h1>
       {/* <BentoProfile /> */}
-      {userData != null ? (
-        <BentoProfile userData={userData.data} />
-      ) : (
-        <BentoProfile />
-      )}
+      <ProfileView initialData={codingPlatformData} />
     </div>
   );
 }

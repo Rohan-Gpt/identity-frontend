@@ -1,71 +1,37 @@
 "use client";
-import { useEffect, useState } from "react";
-import CodeChef from "./codeChef";
+
+import { CodingPlatformData, Contribution } from "@/types";
 import CodeForces from "./codeforces";
 import ContributionGraph from "./contribution";
 import HackerRank from "./hackerRank";
 import LeetCode from "./leetcode";
+import Github from "./github";
 
-export default function BentoProfile({ userData }: { userData?: any }) {
-  const [contributions, setContributions] = useState(
-    userData?.contributions ?? []
-  );
-  useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8787/api/v1/ws`);
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-      ws.send("Hello from client!");
-    };
-    ws.onmessage = (event) => {
-      console.log("WebSocket message received:", event.data);
-      const contribData = JSON.parse(event.data).data;
-      console.log("Parsed contribution data:", contribData);
-      setContributions(contribData);
-    };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
-  useEffect(() => {
-    if (userData?.contributions) {
-      setContributions(userData.contributions);
-    }
-  }, [userData?.contributions]);
-  if (userData) {
-    console.log("BentoProfile userData", userData);
-    return (
-      <div>
-        <div className="grid grid-cols-4 gap-8 justify-between items-center">
-          <div className=" col-span-1 row-span-2">
-            <LeetCode data={userData?.platformData.leetcode} />
-          </div>
-          <CodeForces data={userData?.platformData.codeforces} />
-          <CodeChef data={userData?.platformData.codechef} />
-          <HackerRank data={userData?.platformData.hackerRank} />
-          <div className="col-span-3">
-            <ContributionGraph contribution={contributions} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+export default function BentoProfile({
+  platformData,
+  contributions,
+  isLoading,
+}: {
+  platformData: CodingPlatformData["platformData"];
+  contributions: Contribution[];
+  isLoading: boolean;
+}) {
+  console.log("Rendering BentoProfile with data:", {
+    platformData,
+    contributions,
+  });
   return (
     <div>
-      <div className="grid grid-cols-4 gap-8 justify-between items-center mx-72">
-        <div className=" col-span-1 row-span-2">
-          <LeetCode />
-        </div>
-        <CodeForces />
-        <CodeChef />
-        <HackerRank />
+      <div className="grid grid-cols-4 gap-8 justify-between items-center">
+        <LeetCode data={platformData.leetcode} />
+        <CodeForces data={platformData.codeforces} />
+        <Github />
+        <HackerRank data={platformData.hackerRank} />
         <div className="col-span-3">
-          {/* <ContributionGraph contribution={userData?.contribution} /> */}
+          <ContributionGraph
+            contribution={contributions}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </div>
