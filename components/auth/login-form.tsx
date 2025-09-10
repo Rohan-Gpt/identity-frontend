@@ -33,8 +33,12 @@ export default function LoginForm() {
   });
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    setError("");
+    setSuccess("");
+    console.log("Form submitted with values:", values);
     startTransition(() => {
       Login(values).then((data) => {
+        console.log("Login response:", data);
         setError(data?.error);
         setSuccess(data?.success);
       });
@@ -46,7 +50,7 @@ export default function LoginForm() {
       <CardWrapper
         headerLabel="Welcome back to OASIS"
         backButtonLabel="Don't have an Account? Register"
-        backButtonHref="/auth/register"
+        backButtonHref="/register"
         showSocial={true}
       >
         <Form {...form}>

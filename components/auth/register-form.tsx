@@ -46,7 +46,7 @@ export default function RegisterForm() {
       <CardWrapper
         headerLabel="Welcome to OASIS"
         backButtonLabel="Already have an Account? Login"
-        backButtonHref="/auth/login"
+        backButtonHref="/login"
         showSocial={true}
       >
         <Form {...form}>
