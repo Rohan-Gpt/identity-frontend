@@ -6,7 +6,7 @@ import { cookies } from "next/headers"; // Import the cookies function
 export default async function ProfilePage({
   params,
 }: {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
   if (username === undefined) {

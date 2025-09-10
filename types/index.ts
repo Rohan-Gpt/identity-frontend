@@ -19,3 +19,7 @@ export interface PlatformData {
   hackerRank: any;
   codechef: any;
 }
+
+export interface CodingPlatformData {
+  platformData: PlatformData;
+}
