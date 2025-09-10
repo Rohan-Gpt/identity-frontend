@@ -47,7 +47,7 @@ export function useContributionData(initialContributions: Contribution[] = []) {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, contributions]);
+  }, [isLoading]);
 
   const debouncedRefetch = useDebouncedCallback(fetchContributions, 500);
 
